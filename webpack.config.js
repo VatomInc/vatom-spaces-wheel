@@ -47,11 +47,11 @@ module.exports.module.rules.push({
 
 // Copy all files from the resources/ folder into the dist/ folder when building
 const CopyPlugin = require("copy-webpack-plugin")
-// module.exports.plugins.push(new CopyPlugin({
-//     patterns: [
-//         { from: path.resolve(__dirname, 'resources'), to: "./" },
-//     ],
-// }))
+module.exports.plugins.push(new CopyPlugin({
+    patterns: [
+        { from: path.resolve(__dirname, 'resources'), to: "./" },
+    ],
+}))
 
 // Add support for the dev server
 module.exports.devServer = {
