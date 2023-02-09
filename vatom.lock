@@ -1,0 +1,15 @@
+{
+  "id": "vatom-spaces-wheel",
+  "name": "Radial Wheel",
+  "version": "1.0.0",
+  "beta": true,
+  "personalPlugin": true,
+  "description": "Radial wheel that can be used to perform actions.",
+  "longDescription": "Radia wheel that can be used to perform actions.",
+  "configuration": "Install the plugin.<br/>Hold the <kbd>1</kbd> key on your keyboard (or hold the screen on mobile) and select an action to perform.",
+  "category": "Productivity Tools",
+  "businessId": "s9Q5oh51C4",
+  "price": 0,
+  "releaseNotes": "Initial release",
+  "entrypoint": ""
+}
