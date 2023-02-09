@@ -103,7 +103,7 @@ export default class RadialWheelPlugin extends BasePlugin {
             }
 
             // Add action
-            data.push(action)
+            data.push({ ...action, slotID: info.id })
         }
 
         // Send message to assign slots
