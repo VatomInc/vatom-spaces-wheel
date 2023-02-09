@@ -23,7 +23,7 @@ export default class RadialWheelPlugin extends BasePlugin {
     isOpen = false
 
     /** Actions that have been registered */
-    actions = []
+    actions = [{ id: '-', name: '-' }]
 
     /** Called on load */
     onLoad() {
@@ -34,7 +34,31 @@ export default class RadialWheelPlugin extends BasePlugin {
         this.user.getID().then(uid => this.userID = uid)
 
         // Retrieve all available actions
-        this.getActions()
+        this.getActions().then(() => {
+
+            // Use names as values
+            const values = this.actions.map(act => act.name)
+
+            // Register settings
+            this.menus.register({
+                id: 'radial-wheel-settings',
+                section: 'plugin-settings',
+                panel: {
+                    fields: [
+                        { type: 'section', name: 'Options' },
+                        { id: 'slot-1', name: 'Slot 1', type: 'select', values: values, help: 'Action that will be assigned to the first slot.' },
+                        { id: 'slot-2', name: 'Slot 2', type: 'select', values: values, help: 'Action that will be assigned to the second slot.' },
+                        { id: 'slot-3', name: 'Slot 3', type: 'select', values: values, help: 'Action that will be assigned to the third slot.' },
+                        { id: 'slot-4', name: 'Slot 4', type: 'select', values: values, help: 'Action that will be assigned to the fourth slot.' },
+                        { id: 'slot-5', name: 'Slot 5', type: 'select', values: values, help: 'Action that will be assigned to the fifth slot.' },
+                        { id: 'slot-6', name: 'Slot 6', type: 'select', values: values, help: 'Action that will be assigned to the sixth slot.' },
+                        { id: 'slot-7', name: 'Slot 7', type: 'select', values: values, help: 'Action that will be assigned to the seventh slot.' },
+                        { id: 'slot-8', name: 'Slot 8', type: 'select', values: values, help: 'Action that will be assigned to the eighth slot.' },
+                    ]
+                }
+            })
+
+        })
     }
 
     /** Called on unload */
@@ -43,8 +67,48 @@ export default class RadialWheelPlugin extends BasePlugin {
         this.hooks.removeHandler('controls.key.up', this.onKeyUp)
     }
 
+    /** Called when the settings have been updated */
+    onSettingsUpdated() {
+        const values = [
+            { id: 'slot-1', value: this.getField('slot-1') },
+            { id: 'slot-2', value: this.getField('slot-2') },
+            { id: 'slot-3', value: this.getField('slot-3') },
+            { id: 'slot-4', value: this.getField('slot-4') },
+            { id: 'slot-5', value: this.getField('slot-5') },
+            { id: 'slot-6', value: this.getField('slot-6') },
+            { id: 'slot-7', value: this.getField('slot-7') },
+            { id: 'slot-8', value: this.getField('slot-8') }
+        ]
+
+        let data = []
+
+        // Check that no two slots have the same 
+        for (let info of values) {
+            if (info.value == null) {
+                continue
+            }
+
+            // Find action based on name
+            let action = this.actions.find(act => act.name === info.value)
+            if (!action) {
+                continue
+            }
+
+            // Add action
+            data.push(action)
+        }
+
+        // Send message to assign slots
+        this.menus.postMessage({ action: 'assign-slots', data })
+    }
+
     /** Called when we receive a message */
     onMessage(msg) {
+        // Stop if not from yourself
+        if (msg.fromID != this.userID) {
+            return
+        }
+
         // Not enough message information
         if (!msg || !msg.id || !msg.event) {
             console.log('[RadialWheel] Not enough information from message', msg)
@@ -68,9 +132,12 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Retrieves all actions that can be assigned */
     async getActions() {
         let acts = await this.hooks.triggerAll('radial-wheel.action')
+        if (!acts || acts.length < 1) {
+            return
+        }
 
         // Add all actions
-        this.actions = []
+        this.actions = [{ id: '-', name: '-' }]
         for (let act of acts) {
             this.actions.push({ id: act.id, name: act.name, icon: act.icon, hookName: act.hookName })
         }
