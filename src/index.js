@@ -35,6 +35,14 @@ export default class RadialWheelPlugin extends BasePlugin {
 
         // Retrieve all available actions
         this.getActions()
+
+        this.menus.register({
+            id: 'wheel',
+            section: 'overlay-top',
+            panel: {
+                iframeURL: this.paths.absolute('ui-build/panel/index.html')
+            }
+        })
     }
 
     /** Called on unload */
@@ -128,6 +136,7 @@ export default class RadialWheelPlugin extends BasePlugin {
         // TODO: Open wheel
         this.isOpen = true
         console.log('== opening radial menu')
+        this.menus.postMessage({action: 'create-wheel'}, "*")
     }
 
     /** Closes the radial wheel, if not already closed */
@@ -145,6 +154,7 @@ export default class RadialWheelPlugin extends BasePlugin {
         // TODO: Close wheel
         this.isOpen = false
         console.log('== closing radial menu')
+        this.menus.postMessage({action: 'destroy-wheel'}, "*")
     }
 
     /**
