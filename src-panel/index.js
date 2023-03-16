@@ -4,34 +4,16 @@ import { createRoot } from 'react-dom/client'
 
 export default class App extends React.PureComponent {
 
-    showWheel = false
-
-    /** Show Wheel */
-    static show() {
-        // Already showing
-        // if (this.div) {
-        //     return
-        // }
-
-        // // Create container div
-        // this.div = document.createElement('div')
-        // document.body.appendChild(this.div)
-
-        // // Render it
-        // ReactDOM.render(<Wheel ref={r => this.singleton = r} />, this.div)
-
-    }
-
-    /** Remove Wheel */
-    static destroy() {
-        // // Already destroyed
-        // if (!this.div) {
-        //     return
-        // }
-
-        // ReactDOM.unmountComponentAtNode(this.div)
-        // this.div?.parentElement?.removeChild(this.div)
-        // this.div = null
+    state={
+        showWheel: false,
+        slot1: null,
+        slot2: null,
+        slot3: null,
+        slot4: null,
+        slot5: null,
+        slot6: null,
+        slot7: null,
+        slot8: null
     }
 
     componentDidMount(){
@@ -46,25 +28,32 @@ export default class App extends React.PureComponent {
     onMessage = e => {
 
         if(e.data.action == 'create-wheel'){
-            this.showWheel = true
-            this.forceUpdate()
+            if(!this.state.showWheel){
+                this.setState({showWheel: true})
+            }
         }
 
         if(e.data.action == 'destroy-wheel'){
-            this.showWheel = false
-            this.forceUpdate()
+            if(this.state.showWheel){
+                this.setState({showWheel: false})
+            }
+        }
+
+        if(e.data.action == 'assign-slots'){
+            let slotItems = e.data.data
+            console.log(slotItems)
         }
     }
 
    render = () => {
     return <>
-        {this.showWheel ? <>
+        {this.state.showWheel ? <>
             <div style={{position: 'fixed', top: '15%', left: '40%', transform: 'translate(-50%, -50%)'}}>
           
                 <div>
                     <img src={require('../resources/wheel-segment-gradient.svg')} style={{position: 'fixed', transform: 'translate(0px, 0px)', opacity: '40%'}}/>
-                    {/* <img src={require('../resources/wheel-segment-gradient.svg')} style={{position:'absolute'}}/>
-                    <div style={{position: 'absolute', color: 'black'}}>TEXT</div> */}
+                    <img width={64} src={require('../resources/wheel-segment-gradient.svg')} style={{position:'absolute', top: 32, left: 62}}/>
+                    <div style={{position: 'absolute', color: 'black', top: 98, left: 78}}>TEXT</div>
                 </div>
 
                 <img src={require('../resources/wheel-segment-gradient.svg')} style={{position: 'fixed', transform: 'rotate(45deg) translate(128px, -58px)', opacity: '40%'}}/>
