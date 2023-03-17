@@ -13,6 +13,12 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Identifier of the current user */
     userID = null
 
+    /** Identifier of the menu item */
+    menuID = 'wheel'
+
+    /** Key that is used to show the wheel */
+    keyCode = 'Digit1'
+
     /** Last key that was pressed */
     lastKeyDown = ''
 
@@ -33,12 +39,14 @@ export default class RadialWheelPlugin extends BasePlugin {
         // Get current user identifier
         this.user.getID().then(uid => this.userID = uid)
 
+        // Register overlay
         this.menus.register({
-            id: 'wheel',
+            id: this.menuID,
             section: 'overlay-top',
             panel: {
-                iframeURL: this.paths.absolute('ui-build/panel/index.html')
-            }
+                iframeURL: this.paths.absolute('ui-build/panel/index.html'),
+                pointerEvents: 'none',
+            },
         })
 
         // Retrieve all available actions
@@ -53,7 +61,7 @@ export default class RadialWheelPlugin extends BasePlugin {
                 section: 'plugin-settings',
                 panel: {
                     fields: [
-                        { type: 'section', name: 'Options' },
+                        { type: 'section', id: 'options', name: 'Options' },
                         { id: 'slot-1', name: 'Slot 1', type: 'select', values: values, help: 'Action that will be assigned to the first slot.' },
                         { id: 'slot-2', name: 'Slot 2', type: 'select', values: values, help: 'Action that will be assigned to the second slot.' },
                         { id: 'slot-3', name: 'Slot 3', type: 'select', values: values, help: 'Action that will be assigned to the third slot.' },
@@ -90,7 +98,7 @@ export default class RadialWheelPlugin extends BasePlugin {
 
         let data = []
 
-        // Check that no two slots have the same 
+        // Assign relevant actions to the slots
         for (let info of values) {
             if (info.value == null) {
                 continue
@@ -107,32 +115,27 @@ export default class RadialWheelPlugin extends BasePlugin {
         }
 
         // Send message to assign slots
-        this.menus.postMessage({ action: 'assign-slots', data })
+        this.menus.postMessage({ action: 'assign-slots', slots: data })
     }
 
     /** Called when we receive a message */
     onMessage(msg) {
-        // Stop if not from yourself
-        if (msg.fromID != this.userID) {
+        // Not enough message information
+        if (!msg || !msg.event) {
+            console.warn('[RadialWheel] Not enough information from message', msg)
             return
         }
 
-        // Not enough message information
-        if (!msg || !msg.id || !msg.event) {
-            console.log('[RadialWheel] Not enough information from message', msg)
+        // User hovered over wheel item
+        if (msg.event === 'hover') {
+            if (msg.id) this.performAction(msg.id)
             return
         }
 
         // User clicked on a wheel item
         if (msg.event === 'click') {
             this.close(true)
-            this.performAction(msg.id)
-            return
-        }
-
-        // User hovered over wheel item
-        if (msg.event === 'hover') {
-            this.performAction(msg.id)
+            if (msg.id) this.performAction(msg.id)
             return
         }
     }
@@ -170,7 +173,7 @@ export default class RadialWheelPlugin extends BasePlugin {
         this.lastKeyDown = pressed
 
         // Only open if held for long enough
-        if (!this.isOpen && this.lastKeyDown === 'Digit1' && Date.now() - this.keyHoldStart >= 600) {
+        if (!this.isOpen && this.lastKeyDown === this.keyCode && Date.now() - this.keyHoldStart >= 600) {
             this.open()
         }
     }
@@ -200,10 +203,10 @@ export default class RadialWheelPlugin extends BasePlugin {
             return
         }
 
-        // TODO: Open wheel
+        // Open wheel
         this.isOpen = true
-        console.log('== opening radial menu')
-        this.menus.postMessage({action: 'create-wheel'}, "*")
+        this.menus.update(this.menuID, { panel: { pointerEvents: 'auto' } })
+        this.menus.postMessage({ action: 'create-wheel' })
     }
 
     /** Closes the radial wheel, if not already closed */
@@ -215,13 +218,17 @@ export default class RadialWheelPlugin extends BasePlugin {
 
         // Send a hover check if we are not closing from a click
         if (!fromClick) {
-            this.messages.send('radial-wheel.check-hover', false, this.userID)
+            this.menus.postMessage({ action: 'check-hover' })
         }
 
-        // TODO: Close wheel
+        // Close wheel
         this.isOpen = false
-        console.log('== closing radial menu')
-        this.menus.postMessage({action: 'destroy-wheel'}, "*")
+        this.menus.update(this.menuID, { panel: { pointerEvents: 'none' } })
+        this.menus.postMessage({ action: 'destroy-wheel' })
+
+        // Reset key pressed
+        this.lastKeyDown = null
+        this.keyHoldStart = Date.now()
     }
 
     /**
