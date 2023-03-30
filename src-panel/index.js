@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 
 /** Prefix used for each wheel slice */
@@ -19,14 +19,14 @@ export default class App extends React.PureComponent {
 
     /** Slots that are available */
     slots = [
-        { id: '1', name: 'Text', action: '', rotation: 0, translate: '0px, 0px' },
-        { id: '2', name: 'Text', action: '', rotation: 45, translate: '135px, 55px' },
-        { id: '3', name: 'Text', action: '', rotation: 90, translate: '190px, 190px' },
-        { id: '4', name: 'Text', action: '', rotation: 135, translate: '135px, 325px' },
-        { id: '5', name: 'Text', action: '', rotation: 180, translate: '0px, 380px' },
-        { id: '6', name: 'Text', action: '', rotation: 225, translate: '-135px, 325px' },
-        { id: '7', name: 'Text', action: '', rotation: 270, translate: '-190px, 190px' },
-        { id: '8', name: 'Text', action: '', rotation: 315, translate: '-135px, 55px' },
+        { id: '1', name: 'Text', action: '', key: 'Digit1', rotation: 0, translate: '0px, 0px' },
+        { id: '2', name: 'Text', action: '', key: 'Digit2', rotation: 45, translate: '135px, 55px' },
+        { id: '3', name: 'Text', action: '', key: 'Digit3', rotation: 90, translate: '190px, 190px' },
+        { id: '4', name: 'Text', action: '', key: 'Digit4', rotation: 135, translate: '135px, 325px' },
+        { id: '5', name: 'Text', action: '', key: 'Digit5', rotation: 180, translate: '0px, 380px' },
+        { id: '6', name: 'Text', action: '', key: 'Digit6', rotation: 225, translate: '-135px, 325px' },
+        { id: '7', name: 'Text', action: '', key: 'Digit7', rotation: 270, translate: '-190px, 190px' },
+        { id: '8', name: 'Text', action: '', key: 'Digit8', rotation: 315, translate: '-135px, 55px' },
     ]
 
     /** Called after first render */
@@ -48,6 +48,21 @@ export default class App extends React.PureComponent {
         window.parent.focus()
     }
 
+    /** Called when a key is released */
+    onKeyUp = evt => {
+        if (!this.slots || this.slots.length < 1) {
+            return
+        }
+
+        // No matching key exists in currently available slots
+        const id = this.slots.find(slot => slot.key === evt.key)?.id
+        if (!id) {
+            return
+        }
+
+        console.log('triggered slot', id)
+    }
+
     /** Receives messages from plugin */
     onMessage = evt => {
         if (!evt?.data) {
@@ -55,6 +70,12 @@ export default class App extends React.PureComponent {
         }
 
         const data = evt.data
+
+        // Key has been released
+        if (data.action === 'key-up') {
+            this.onKeyUp(data)
+            return
+        }
 
         // Create wheel
         if (data.action === 'create-wheel' && !this.state.showWheel) {
@@ -109,7 +130,8 @@ const WheelSlice = props => {
         setHovering(hover)
     }
 
-    return <img id={`${wheelPrefix}-${props.slot.id}`} draggable="false" src={require('./slice.svg')} onMouseEnter={e => updateHover(true)} onMouseLeave={e => updateHover(false)} style={{ position: 'fixed', transform: `translate(${props.slot.translate}) rotate(${props.slot.rotation}deg)`, opacity: isHovering ? 0.94 : 0.5, userSelect: 'none', transition: 'all 0.3s' }} />
+    return <div id={`${wheelPrefix}-${props.slot.id}`} onMouseEnter={e => updateHover(true)} onMouseLeave={e => updateHover(false)} style={{ position: 'fixed', width: 70, height: 70, backgroundColor: '#343434', borderRadius: 15, transform: `translate(${props.slot.translate}) rotate(${props.slot.rotation}deg)`, opacity: isHovering ? 0.94 : 0.5, userSelect: 'none', transition: 'all 0.3s' }} />
+    // return <img id={`${wheelPrefix}-${props.slot.id}`} draggable="false" src={require('./slice.svg')} onMouseEnter={e => updateHover(true)} onMouseLeave={e => updateHover(false)} style={{ position: 'fixed', transform: `translate(${props.slot.translate}) rotate(${props.slot.rotation}deg)`, opacity: isHovering ? 0.94 : 0.5, userSelect: 'none', transition: 'all 0.3s' }} />
 }
 
 // Render app

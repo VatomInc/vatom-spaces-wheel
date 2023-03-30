@@ -17,7 +17,7 @@ export default class RadialWheelPlugin extends BasePlugin {
     menuID = 'wheel'
 
     /** Key that is used to show the wheel */
-    keyCode = 'Digit1'
+    keyCode = 'KeyR'
 
     /** Last key that was pressed */
     lastKeyDown = ''
@@ -157,6 +157,7 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Called when a key is pressed */
     onKeyDown = evt => {
         let pressed = evt.code
+        this.menus.postMessage({ action: 'key-down', key: pressed })
 
         // Set last key initially
         if (!this.lastKeyDown) {
@@ -181,6 +182,7 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Called when a key is released */
     onKeyUp = evt => {
         let released = evt.code
+        this.menus.postMessage({ action: 'key-up', key: released })
 
         // Not same key that has been recorded
         if (this.lastKeyDown != released) {
