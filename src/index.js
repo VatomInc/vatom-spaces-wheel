@@ -62,14 +62,46 @@ export default class RadialWheelPlugin extends BasePlugin {
                 panel: {
                     fields: [
                         { type: 'section', id: 'options', name: 'Options' },
-                        { id: 'slot-1', name: 'Slot 1', type: 'select', values: values, help: 'Action that will be assigned to the first slot.' },
-                        { id: 'slot-2', name: 'Slot 2', type: 'select', values: values, help: 'Action that will be assigned to the second slot.' },
-                        { id: 'slot-3', name: 'Slot 3', type: 'select', values: values, help: 'Action that will be assigned to the third slot.' },
-                        { id: 'slot-4', name: 'Slot 4', type: 'select', values: values, help: 'Action that will be assigned to the fourth slot.' },
-                        { id: 'slot-5', name: 'Slot 5', type: 'select', values: values, help: 'Action that will be assigned to the fifth slot.' },
-                        { id: 'slot-6', name: 'Slot 6', type: 'select', values: values, help: 'Action that will be assigned to the sixth slot.' },
-                        { id: 'slot-7', name: 'Slot 7', type: 'select', values: values, help: 'Action that will be assigned to the seventh slot.' },
-                        { id: 'slot-8', name: 'Slot 8', type: 'select', values: values, help: 'Action that will be assigned to the eighth slot.' },
+                        { id: 'slot-1', name: 'Slot 1', type: 'two-stack', help: 'Action that will be assigned to the first slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-1') },
+                        },
+                        { id: 'slot-2', name: 'Slot 2', type: 'two-stack', help: 'Action that will be assigned to the second slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-2') },
+                        },
+                        { id: 'slot-3', name: 'Slot 3', type: 'select', help: 'Action that will be assigned to the third slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-3') },
+                        },
+                        { id: 'slot-4', name: 'Slot 4', type: 'select', help: 'Action that will be assigned to the fourth slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-4') },
+                        },
+                        { id: 'slot-5', name: 'Slot 5', type: 'select', help: 'Action that will be assigned to the fifth slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-5') },
+                        },
+                        { id: 'slot-6', name: 'Slot 6', type: 'select', help: 'Action that will be assigned to the sixth slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-6') },
+                        },
+                        { id: 'slot-7', name: 'Slot 7', type: 'select', help: 'Action that will be assigned to the seventh slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-7') },
+                        },
+                        { id: 'slot-8', name: 'Slot 8', type: 'select', help: 'Action that will be assigned to the eighth slot.',
+                            heightBetween: 5,
+                            first: { type: 'select', values: values },
+                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-8') },
+                        },
                     ]
                 }
             })
@@ -81,6 +113,11 @@ export default class RadialWheelPlugin extends BasePlugin {
     onUnload() {
         this.hooks.removeHandler('controls.key.down', this.onKeyDown)
         this.hooks.removeHandler('controls.key.up', this.onKeyUp)
+    }
+
+    /** Called when we have bound a key to a slot */
+    onKeyBound(key, id) {
+        console.log('bound key', key, 'to', id)
     }
 
     /** Called when the settings have been updated */
