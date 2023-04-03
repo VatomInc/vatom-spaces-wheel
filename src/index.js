@@ -31,6 +31,9 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Actions that have been registered */
     actions = [{ id: '-', name: '-' }]
 
+    /** Actions that have been assigned to slots */
+    assigned = []
+
     /** Called on load */
     onLoad() {
         this.hooks.addHandler('controls.key.down', this.onKeyDown)
@@ -65,42 +68,42 @@ export default class RadialWheelPlugin extends BasePlugin {
                         { id: 'slot-1', name: 'Slot 1', type: 'two-stack', help: 'Action that will be assigned to the first slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-1') },
+                            second: { type: 'bind-key', boundTo: this.actions[1]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-1') },
                         },
                         { id: 'slot-2', name: 'Slot 2', type: 'two-stack', help: 'Action that will be assigned to the second slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-2') },
+                            second: { type: 'bind-key', boundTo: this.actions[2]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-2') },
                         },
-                        { id: 'slot-3', name: 'Slot 3', type: 'select', help: 'Action that will be assigned to the third slot.',
+                        { id: 'slot-3', name: 'Slot 3', type: 'two-stack', help: 'Action that will be assigned to the third slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-3') },
+                            second: { type: 'bind-key', boundTo: this.actions[3]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-3') },
                         },
-                        { id: 'slot-4', name: 'Slot 4', type: 'select', help: 'Action that will be assigned to the fourth slot.',
+                        { id: 'slot-4', name: 'Slot 4', type: 'two-stack', help: 'Action that will be assigned to the fourth slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-4') },
+                            second: { type: 'bind-key', boundTo: this.actions[4]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-4') },
                         },
-                        { id: 'slot-5', name: 'Slot 5', type: 'select', help: 'Action that will be assigned to the fifth slot.',
+                        { id: 'slot-5', name: 'Slot 5', type: 'two-stack', help: 'Action that will be assigned to the fifth slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-5') },
+                            second: { type: 'bind-key', boundTo: this.actions[5]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-5') },
                         },
-                        { id: 'slot-6', name: 'Slot 6', type: 'select', help: 'Action that will be assigned to the sixth slot.',
+                        { id: 'slot-6', name: 'Slot 6', type: 'two-stack', help: 'Action that will be assigned to the sixth slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-6') },
+                            second: { type: 'bind-key', boundTo: this.actions[6]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-6') },
                         },
-                        { id: 'slot-7', name: 'Slot 7', type: 'select', help: 'Action that will be assigned to the seventh slot.',
+                        { id: 'slot-7', name: 'Slot 7', type: 'two-stack', help: 'Action that will be assigned to the seventh slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-7') },
+                            second: { type: 'bind-key', boundTo: this.actions[7]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-7') },
                         },
-                        { id: 'slot-8', name: 'Slot 8', type: 'select', help: 'Action that will be assigned to the eighth slot.',
+                        { id: 'slot-8', name: 'Slot 8', type: 'two-stack', help: 'Action that will be assigned to the eighth slot.',
                             heightBetween: 5,
                             first: { type: 'select', values: values },
-                            second: { type: 'bind-key', boundTo: '', onKeyBound: key => this.onKeyBound(key, 'slot-8') },
+                            second: { type: 'bind-key', boundTo: this.actions[8]?.key || '', onKeyBound: key => this.onKeyBound(key, 'slot-8') },
                         },
                     ]
                 }
@@ -118,22 +121,29 @@ export default class RadialWheelPlugin extends BasePlugin {
     /** Called when we have bound a key to a slot */
     onKeyBound(key, id) {
         console.log('bound key', key, 'to', id)
+
+        // Update key that has been bound to this action
+        const idx = id.split('-')[1]
+        if (this.actions[idx]) {
+            this.actions[idx].key = key
+        }
     }
 
     /** Called when the settings have been updated */
     onSettingsUpdated() {
         const values = [
-            { id: 'slot-1', value: this.getField('slot-1') },
-            { id: 'slot-2', value: this.getField('slot-2') },
-            { id: 'slot-3', value: this.getField('slot-3') },
-            { id: 'slot-4', value: this.getField('slot-4') },
-            { id: 'slot-5', value: this.getField('slot-5') },
-            { id: 'slot-6', value: this.getField('slot-6') },
-            { id: 'slot-7', value: this.getField('slot-7') },
-            { id: 'slot-8', value: this.getField('slot-8') }
+            { id: 'slot-1', value: this.getField('slot-1:first') },
+            { id: 'slot-2', value: this.getField('slot-2:first') },
+            { id: 'slot-3', value: this.getField('slot-3:first') },
+            { id: 'slot-4', value: this.getField('slot-4:first') },
+            { id: 'slot-5', value: this.getField('slot-5:first') },
+            { id: 'slot-6', value: this.getField('slot-6:first') },
+            { id: 'slot-7', value: this.getField('slot-7:first') },
+            { id: 'slot-8', value: this.getField('slot-8:first') }
         ]
 
         let data = []
+        console.log('== values', values)
 
         // Assign relevant actions to the slots
         for (let info of values) {
@@ -179,15 +189,17 @@ export default class RadialWheelPlugin extends BasePlugin {
 
     /** Retrieves all actions that can be assigned */
     async getActions() {
-        let acts = await this.hooks.triggerAll('radial-wheel.action')
+        let acts = await this.hooks.triggerAll('plugins.radial-wheel.add')
         if (!acts || acts.length < 1) {
             return
         }
 
         // Add all actions
-        this.actions = [{ id: '-', name: '-' }]
+        let idx = 1
+        this.actions = [{ id: '-', name: '-', key: '' }]
         for (let act of acts) {
-            this.actions.push({ id: act.id, name: act.name, icon: act.icon, hookName: act.hookName })
+            this.actions.push({ id: act.id, name: act.name, key: `Digit${idx}`, icon: act.icon, hookName: act.hookName })
+            idx += 1
         }
     }
 
